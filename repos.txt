@@ -1,0 +1,2 @@
+www.github.com/exampleorg1/examplerepo1
+www.github.com/exampleorg2/examplerepo2
