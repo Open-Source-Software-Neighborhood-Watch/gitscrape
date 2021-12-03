@@ -1,3 +1,6 @@
+# don't track changes in results.csv
+results.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
