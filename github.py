@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 
 import requests
 
@@ -32,9 +33,40 @@ def get_github_repo_data(repo):
     repo_dict["repo_name"] = repo
     repo_dict["forks"] = repo_items["forks"]
     repo_dict["stars"] = repo_items["stargazers_count"]
+    repo_dict["num_contributors"] = get_number_of_contributors(repo)
     repo_dict["last_updated"] = get_days_since_last_updated(repo_items["updated_at"])
 
     return repo_dict
+
+
+def get_number_of_contributors(repo):
+    """Retrieve number of contributors for a repo.
+
+    SO reference used to create this function:
+    https://stackoverflow.com/questions/44347339/github-api-how-efficiently-get-the-total-contributors-amount-per-repository
+
+    The trick is to set the 'per_page' parameter value to 1 and then count the
+    number of pages.
+
+    Full disclosure: This part of the GitHub API is complicated and hard to figure
+    out precisely. The numbers returned from this particular call seem generally
+    right, but not precisely right.
+
+    Args:
+        repo (str) : a GitHub repo org and repo name (e.g. "psf/requests")
+
+    Return:
+        int: count of contributors
+    """
+    response = requests.get(
+        "https://api.github.com/repos/" + repo + "/contributors?per_page=1&anon=true",
+        # convert username and token to strings per requests's specifications
+        auth=(str(GITHUB_USERNAME), str(GITHUB_TOKEN)),
+    )
+    link_field = response.headers["Link"]
+    # Find number before [>; rel="last"]
+    num_contributors = int(re.findall(r"(\d+)>; rel=\"last\"", link_field)[-1])
+    return num_contributors
 
 
 def extract_github_owner_and_repo(github_page):

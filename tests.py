@@ -5,6 +5,7 @@ import unittest
 from github import (
     extract_github_owner_and_repo,
     get_github_repo_data,
+    get_number_of_contributors,
     read_in_repo_list,
 )
 from utils import get_days_since_last_updated
@@ -17,11 +18,11 @@ class TestGitHubFunctions(unittest.TestCase):
         """Check get_github_repo_data()."""
         test_data = get_github_repo_data("psf/requests")
         self.assertTrue(isinstance(test_data, dict))
-        self.assertTrue(len(test_data) == 4)
         self.assertTrue(test_data["repo_name"] == "psf/requests")
         self.assertTrue(test_data["stars"] > 1000)
         self.assertTrue(test_data["forks"] > 1000)
         self.assertTrue(test_data["last_updated"] < 1000)
+        self.assertTrue(test_data["num_contributors"] > 700)
 
     def test_extract_github_owner_and_repo(self):
         """Check extract_github_owner_and_repo()."""
@@ -38,6 +39,12 @@ class TestGitHubFunctions(unittest.TestCase):
         """Check read_in_repo_list()."""
         test_repo_list = read_in_repo_list("test/test_repos.txt")
         self.assertTrue(test_repo_list == ["psf/requests", "iqtlabs/networkml"])
+
+    def test_get_number_of_contributors(self):
+        """Check get_number_of_contributors()."""
+        test_num_contributors = get_number_of_contributors("iqtlabs/networkml")
+        self.assertTrue(test_num_contributors >= 24)
+        self.assertTrue(test_num_contributors <= 100)
 
 
 class TestUtilityFunctions(unittest.TestCase):

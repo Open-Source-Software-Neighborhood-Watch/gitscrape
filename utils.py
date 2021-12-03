@@ -31,20 +31,28 @@ def add_repo_to_csv(repo_dict):
     Use to create dataset of repos for analysis.
 
     Args:
-        repo_dict
+        repo_dict (dict): info about each package
+
     Returns:
         null
     """
     # newline='' prevents spaces in between entries. Setting encoding to utf-8
     # ensures that most (all?) characters can be read. "a" is for append.
     with open("results.csv", "a", encoding="utf-8", newline="") as file:
-        fieldnames = ["repo_name", "forks", "stars", "last_updated"]
+        fieldnames = [
+            "repo_name",
+            "forks",
+            "stars",
+            "contributor_count",
+            "last_updated",
+        ]
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writerow(
             {
                 "repo_name": repo_dict["repo_name"],
                 "forks": repo_dict["forks"],
                 "stars": repo_dict["stars"],
+                "contributor_count": repo_dict["num_contributors"],
                 "last_updated": repo_dict["last_updated"],
             }
         )
