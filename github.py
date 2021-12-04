@@ -33,10 +33,35 @@ def get_github_repo_data(repo):
     repo_dict["repo_name"] = repo
     repo_dict["forks"] = repo_items["forks"]
     repo_dict["stars"] = repo_items["stargazers_count"]
+    repo_dict["num_commits"] = get_number_of_commits(repo)
     repo_dict["num_contributors"] = get_number_of_contributors(repo)
     repo_dict["last_updated"] = get_days_since_last_updated(repo_items["updated_at"])
 
     return repo_dict
+
+
+def get_number_of_commits(repo):
+    """Retrieve number of commits for a repo.
+
+    Helpful GitHub gist: https://gist.github.com/codsane/25f0fd100b565b3fce03d4bbd7e7bf33#file-commitcount-py
+
+    The trick is to set the 'per_page' parameter value to 1 and then count the
+    number of pages.
+
+    Args:
+        repo (str) : a GitHub repo org and repo name (e.g. "psf/requests")
+
+    Return:
+        int: count of commits
+    """
+    response = requests.get(
+        "https://api.github.com/repos/" + repo + "/commits?per_page=1",
+        # convert username and token to strings per requests's specifications
+        auth=(str(GITHUB_USERNAME), str(GITHUB_TOKEN)),
+    )
+    link_field = response.headers["Link"]
+    num_contributors = int(re.findall(r"(\d+)>; rel=\"last\"", link_field)[-1])
+    return num_contributors
 
 
 def get_number_of_contributors(repo):
