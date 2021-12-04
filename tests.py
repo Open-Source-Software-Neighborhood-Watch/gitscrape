@@ -5,6 +5,7 @@ import unittest
 from github import (
     extract_github_owner_and_repo,
     get_github_repo_data,
+    get_number_of_commits,
     get_number_of_contributors,
     read_in_repo_list,
 )
@@ -23,6 +24,7 @@ class TestGitHubFunctions(unittest.TestCase):
         self.assertTrue(test_data["forks"] > 1000)
         self.assertTrue(test_data["last_updated"] < 1000)
         self.assertTrue(test_data["num_contributors"] > 700)
+        self.assertTrue(test_data["num_commits"] > 1000)
 
     def test_extract_github_owner_and_repo(self):
         """Check extract_github_owner_and_repo()."""
@@ -45,6 +47,13 @@ class TestGitHubFunctions(unittest.TestCase):
         test_num_contributors = get_number_of_contributors("iqtlabs/networkml")
         self.assertTrue(test_num_contributors >= 24)
         self.assertTrue(test_num_contributors <= 100)
+
+    def test_get_number_of_commits(self):
+        """Check get_number_of_commits()."""
+        test_num_commits = get_number_of_commits("iqtlabs/poseidon")
+        self.assertTrue(test_num_commits >= 500)
+        test_num_commits = get_number_of_commits("psf/black")
+        self.assertTrue(test_num_commits >= 1169)
 
 
 class TestUtilityFunctions(unittest.TestCase):
