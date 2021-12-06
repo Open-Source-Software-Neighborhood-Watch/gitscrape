@@ -11,6 +11,8 @@ from utils import get_days_since_last_updated
 GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 
+# pylint: disable=line-too-long
+
 
 def get_github_repo_data(repo):
     """Generate dict of GitHub repo data.
@@ -36,6 +38,7 @@ def get_github_repo_data(repo):
     repo_dict["num_commits"] = get_number_of_commits(repo)
     repo_dict["num_contributors"] = get_number_of_contributors(repo)
     repo_dict["last_updated"] = get_days_since_last_updated(repo_items["updated_at"])
+    repo_dict["num_low_ID_details_contribs"] = get_low_ID_details_contribs_count(repo)
 
     return repo_dict
 
@@ -92,6 +95,79 @@ def get_number_of_contributors(repo):
     # Find number before [>; rel="last"]
     num_contributors = int(re.findall(r"(\d+)>; rel=\"last\"", link_field)[-1])
     return num_contributors
+
+
+def get_user_identity_details_level(username):
+    """Deterime level of identity details provided by a GitHub user.
+
+    Help determine whether a GitHub user provides a lot or little of identity
+    details on their GitHub profile page. If there is no location, no company, no
+    twitter username, no blog link, and no email, then return "low" value.
+    Otherwise, return "high".
+
+    Args:
+        username (str) : a GitHub user name
+
+    Return:
+        str: "low" or "high"
+    """
+    response = requests.get(
+        "https://api.github.com/users/" + username,
+        # convert username and token to strings per requests's specifications
+        auth=(str(GITHUB_USERNAME), str(GITHUB_TOKEN)),
+    )
+    user_items = json.loads(response.text or response.content)
+    # if all fields listed below are blank, then the user identity has
+    # low details
+    low_identity_details_condition = (
+        user_items["location"] in ("", None)
+        and user_items["company"] in ("", None)
+        and user_items["twitter_username"] in ("", None)
+        and user_items["blog"] in ("", None)
+        and user_items["email"] in ("", None)
+    )
+    if low_identity_details_condition:
+        detail_level = "low"
+    else:
+        detail_level = "high"
+    return detail_level
+
+
+def get_low_ID_details_contribs_count(repo, top_x=10):
+    """Count number of low identity details contributors within top_x.
+
+    For definition of low identity details contributors, see
+    get_user_identity_details_level() description.
+
+    Args:
+        repo (str) - a GitHub repo org and repo name (e.g. "psf/requests")
+        top_x (int) - number of top contributors to check for low identity
+
+    Return:
+        int: count of low identity details contributors within top X contribs
+    """
+    # pylint: disable=invalid-name
+    response = requests.get(
+        "https://api.github.com/repos/" + repo + "/contributors?page=1&per_page=100",
+        # convert username and token to strings per requests's specifications
+        auth=(str(GITHUB_USERNAME), str(GITHUB_TOKEN)),
+    )
+
+    committers = []
+    if response.ok:
+        repo_items = json.loads(response.text or response.content)
+        cnt = 1
+        for item in repo_items:
+            if cnt > top_x:
+                break
+            committers.append(item["login"])
+            cnt += 1
+
+    cnt_low_identity_contribs = 0
+    for committer in committers:
+        if get_user_identity_details_level(committer) == "low":
+            cnt_low_identity_contribs += 1
+    return cnt_low_identity_contribs
 
 
 def extract_github_owner_and_repo(github_page):
