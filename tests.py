@@ -5,8 +5,10 @@ import unittest
 from github import (
     extract_github_owner_and_repo,
     get_github_repo_data,
+    get_low_ID_details_contribs_count,
     get_number_of_commits,
     get_number_of_contributors,
+    get_user_identity_details_level,
     read_in_repo_list,
 )
 from utils import get_days_since_last_updated
@@ -25,6 +27,8 @@ class TestGitHubFunctions(unittest.TestCase):
         self.assertTrue(test_data["last_updated"] < 1000)
         self.assertTrue(test_data["num_contributors"] > 700)
         self.assertTrue(test_data["num_commits"] > 1000)
+        # BEWARE: potential changes and flakiness in below assertion
+        self.assertTrue(test_data["num_low_ID_details_contribs"] == 0)
 
     def test_extract_github_owner_and_repo(self):
         """Check extract_github_owner_and_repo()."""
@@ -54,6 +58,33 @@ class TestGitHubFunctions(unittest.TestCase):
         self.assertTrue(test_num_commits >= 500)
         test_num_commits = get_number_of_commits("psf/black")
         self.assertTrue(test_num_commits >= 1169)
+
+    def test_get_user_identity_details_level(self):
+        """Check get_user_identity_details_level()."""
+        test_user_identity_details_level = get_user_identity_details_level(
+            "kennethreitz"
+        )
+        self.assertTrue(test_user_identity_details_level == "high")
+        test_user_identity_details_level = get_user_identity_details_level(
+            "perfectnewer"
+        )
+        self.assertTrue(test_user_identity_details_level == "low")
+
+    def test_get_low_ID_details_contribs_count(self):
+        """Check get_low_ID_details_contribs_count()."""
+        # BEWARE: These values could change for requests and networkml could change
+        # as contributors to these repos change and as contributors change their
+        # GitHub profiles. If this test breaks or becomes flaky, pay attention to
+        # this possibility.
+        # pylint: disable=invalid-name
+        test_low_ID_details_contribs_count = get_low_ID_details_contribs_count(
+            "psf/requests"
+        )
+        self.assertTrue(test_low_ID_details_contribs_count == 0)
+        test_low_ID_details_contribs_count = get_low_ID_details_contribs_count(
+            "iqtlabs/networkml"
+        )
+        self.assertTrue(test_low_ID_details_contribs_count > 0)
 
 
 class TestUtilityFunctions(unittest.TestCase):
