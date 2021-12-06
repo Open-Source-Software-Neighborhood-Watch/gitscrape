@@ -30,7 +30,7 @@ def read_CSV(file, json_file):
                 [
                     {
                         # row_types[field[i]] leads to a field-specific
-                        # type conversion 
+                        # type conversion
                         field[i]: row_types[field[i]](row[field[i]])
                         for i in range(len(field))
                     }
