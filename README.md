@@ -1,6 +1,10 @@
 # gitscrape
 Scrape git* for data
 
+*Input*: one or more GitHub repos
+
+*Output*: Summary data on each GitHub repo in a .csv
+
 # Usage
 
 1. Install dependencies:
