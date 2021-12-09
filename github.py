@@ -35,6 +35,7 @@ def get_github_repo_data(repo):
     repo_dict["repo_name"] = repo
     repo_dict["forks"] = repo_items["forks"]
     repo_dict["stars"] = repo_items["stargazers_count"]
+    repo_dict["topics"] = repo_items["topics"]
     repo_dict["num_commits"] = get_number_of_commits(repo)
     repo_dict["num_contributors"] = get_number_of_contributors(repo)
     repo_dict["last_updated"] = get_days_since_last_updated(repo_items["updated_at"])
