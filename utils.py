@@ -47,6 +47,7 @@ def add_repo_to_csv(repo_dict):
             "number_of_commits",
             "last_updated",
             "num_low_ID_details_contribs",
+            "topics",
         ]
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writerow(
@@ -58,5 +59,6 @@ def add_repo_to_csv(repo_dict):
                 "number_of_commits": repo_dict["num_commits"],
                 "last_updated": repo_dict["last_updated"],
                 "num_low_ID_details_contribs": repo_dict["num_low_ID_details_contribs"],
+                "topics": repo_dict["topics"],
             }
         )

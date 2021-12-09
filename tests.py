@@ -27,8 +27,21 @@ class TestGitHubFunctions(unittest.TestCase):
         self.assertTrue(test_data["last_updated"] < 1000)
         self.assertTrue(test_data["num_contributors"] > 700)
         self.assertTrue(test_data["num_commits"] > 1000)
-        # BEWARE: potential changes and flakiness in below assertion
+        # BEWARE: potential changes and flakiness in below assertions
         self.assertTrue(test_data["num_low_ID_details_contribs"] == 0)
+        self.assertTrue(
+            test_data["topics"]
+            == [
+                "client",
+                "cookies",
+                "forhumans",
+                "http",
+                "humans",
+                "python",
+                "python-requests",
+                "requests",
+            ]
+        )
 
     def test_extract_github_owner_and_repo(self):
         """Check extract_github_owner_and_repo()."""
